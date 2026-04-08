@@ -11,3 +11,12 @@ wheels/
 
 # Environment variables
 .env
+
+# Test scripts
+test-script.py
+
+# Profiles
+browser_automation_profile/
+
+# Folders
+output_files/

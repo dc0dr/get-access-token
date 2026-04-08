@@ -22,8 +22,15 @@ def key_scraper(context, page) -> None:
     logger.info("🔄 Starting the access key scraper.....\n")
     try:
         page.get_by_role("button", name="Run query").click()
+        logger.info("Query button exists. ✅ Clicked the run query button....")
+        page.get_by_role("tab", name="Access token").click()
+        logger.info("Access token tab exists. ✅ Clicked the access token tab....")
+        access_key = page.locator("id=access-token").innner_text()
+        logger.info("✅ Access token successfully obtained\n")
+        
+        return access_key
         
     except Exception as e:
-        logger.exception("❌ Error: %s", e)
+        logger.exception("❌ Access key scraper failed: %s", e)
         return None
     
