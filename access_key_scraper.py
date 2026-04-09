@@ -9,8 +9,8 @@ def key_scraper(context, page) -> None:
     Scrapes the access key from the Workfront login page.
     
     Args:
-        context: Playwright context
-        page: Playwright page
+        context: The Playwright browser context from login_bypass
+        page: The active page from login_bypass
     
     Returns:
         None
