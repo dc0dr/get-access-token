@@ -1,6 +1,8 @@
 import logging
 
 from login_bypass import login_bypass
+from access_key_scraper import key_scraper
+from file_uploader import upload_file
 
 logging.basicConfig(
     level = logging.INFO,
@@ -10,9 +12,24 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
-    logger.info("Starting the get-access-token script.....")
-    login_bypass()
-    logger.info("✅ Get-access-token script completed successfully")
+    p, context, page = login_bypass()
+
+    if context is None:
+        logger.exception("❌ Login bypass failed, exiting.....")
+        return
+    
+    try:
+        access_key = key_scraper(context, page)
+        upload_file(access_key)
+        logger.info("\n✅ Get-access-token script completed successfully")
+    finally:
+        # Clean up resources
+        try:
+            context.close()
+            p.stop()
+        except Exception as e:
+            logger.exception("❌ Error during cleanup: %s", e)
+    
 
 
 if __name__ == "__main__":
