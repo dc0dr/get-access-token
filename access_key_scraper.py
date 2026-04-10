@@ -25,7 +25,7 @@ def key_scraper(context, page) -> None:
         logger.info("Query button exists. ✅ Clicked the run query button....")
         page.get_by_role("tab", name="Access token").click()
         logger.info("Access token tab exists. ✅ Clicked the access token tab....")
-        access_key = page.locator("id=access-token").innner_text()
+        access_key = page.locator("id=access-token").inner_text()
         logger.info("✅ Access token successfully obtained\n")
         
         return access_key

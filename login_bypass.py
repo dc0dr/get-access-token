@@ -60,6 +60,7 @@ def login_bypass() -> Any:
             elif "wvi.onelogin.com" in current_url:
                 logger.info("➡️ OneLogin page detected\n")
                 handle_onelogin_popup(popup, USERNAME, PASSWORD)
+                break
 
             # Wait for a bit and recheck
             popup.wait_for_timeout(1500)
@@ -76,7 +77,9 @@ def login_bypass() -> Any:
 
         # === Verify login succeeded ===
         try:
-            page.wait_for_selector(f"button[aria-label*='{NAME} Sign Out']", timeout=2000)
+            #page.wait_for_selector(f"button[aria-label*='{NAME} Sign Out']", timeout=20000) //just realised it was deprecated after reading the docs
+            login_verifier = page.locator(f"button[aria-label*='{NAME} Sign out' i]")
+            login_verifier.wait_for(state="attached", timeout=20000)
             logger.info("✅ Successfully signed in to Graph Explorer!\n")
         except PlaywrightTimeoutError:
             logger.exception("⚠️ Could not confirm sign-in; check browser window manually!")

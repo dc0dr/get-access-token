@@ -21,7 +21,7 @@ def main():
     try:
         access_key = key_scraper(context, page)
         upload_file(access_key)
-        logger.info("\n✅ Get-access-token script completed successfully")
+        logger.info("✅ Get-access-token script completed successfully")
     finally:
         # Clean up resources
         try:
