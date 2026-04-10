@@ -20,3 +20,6 @@ browser_automation_profile/
 
 # Folders
 output_files/
+
+# Miscellaneous
+.DS_Store

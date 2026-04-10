@@ -19,7 +19,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def login_bypass() -> Any:
-    profile_path = os.path.join(os.getcwd(), "browser_automation_profile")
+    project_root = os.path.dirname(os.path.abspath(__file__))
+    profile_path = os.path.join(project_root, "browser_automation_profile")
     os.makedirs(profile_path, exist_ok=True)
 
     p = sync_playwright().start()
