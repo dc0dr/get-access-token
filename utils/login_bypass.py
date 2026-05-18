@@ -28,7 +28,7 @@ def login_bypass() -> Any:
     context = p.chromium.launch_persistent_context(
         user_data_dir=profile_path,
         channel="msedge",
-        headless=False,
+        headless=True,
         args=["--start-maximized"],
         slow_mo=1500,
     )
