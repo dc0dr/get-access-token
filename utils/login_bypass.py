@@ -5,7 +5,11 @@ import logging
 from typing import Any
 from urllib.parse import urlparse
 
+# overrides env vars if already loaded to prevent stale values and reflect changes in the .env file
+# Without override=True, if .env was changed after the script started, the script would keep using the old values
 load_dotenv(override=True)
+
+
 USER_LOCATOR = os.environ["USER_LOCATOR"]
 USERNAME = os.environ["EMAIL"]
 PASSWORD = os.environ["PASSWORD"]
@@ -28,7 +32,7 @@ def login_bypass() -> Any:
     context = p.chromium.launch_persistent_context(
         user_data_dir=profile_path,
         channel="msedge",
-        headless=False,
+        headless=True,
         args=["--start-maximized"],
         slow_mo=1500,
     )
