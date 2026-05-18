@@ -1,8 +1,8 @@
 import logging
 
-from login_bypass import login_bypass
-from access_key_scraper import key_scraper
-from file_uploader import upload_file
+from utils.login_bypass import login_bypass
+from utils.access_key_scraper import key_scraper
+from utils.file_uploader import upload_file
 
 logging.basicConfig(
     level = logging.INFO,
