@@ -1,6 +1,6 @@
 # 🔑 Get Access Token
 
-A Python automation script that signs into [Microsoft Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer) via browser automation, retrieves an access token, and saves it to a specified location on your machine.
+A Python automation script that signs into [Microsoft Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer) via browser automation, retrieves the access token, and saves it to a specified location on your machine.
 
 ## How It Works
 
