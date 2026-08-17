@@ -1,10 +1,11 @@
+from typing import Any
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def key_scraper(context, page) -> None:
+def key_scraper(context, page) -> Any:
     """
     Scrapes the access key from the Workfront login page.
     
