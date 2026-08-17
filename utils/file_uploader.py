@@ -3,7 +3,7 @@ import shutil
 import logging
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 DESTINATION_DIR = os.environ["DESTINATION_DIR"]
 

@@ -5,7 +5,11 @@ import logging
 from typing import Any
 from urllib.parse import urlparse
 
-load_dotenv()
+# overrides env vars if already loaded to prevent stale values and reflect changes in the .env file
+# Without override=True, if .env was changed after the script started, the script would keep using the old values
+load_dotenv(override=True)
+
+
 USER_LOCATOR = os.environ["USER_LOCATOR"]
 USERNAME = os.environ["EMAIL"]
 PASSWORD = os.environ["PASSWORD"]
