@@ -12,7 +12,7 @@ The script uses [Playwright](https://playwright.dev/python/) to drive a real Mic
 2. **`access_key_scraper`** — Runs the default Graph query and copies the access token from the "Access token" tab.
 3. **`file_uploader`** — Writes the token to a local file, copies it to a configured destination directory (e.g. OneDrive), and cleans up the original.
 
-A persistent browser profile (`utils/browser_automation_profile/`) is used so that cached sessions & cookies carry over between runs, reducing how often full credentials are needed.
+A persistent browser profile (`utils/browser_automation_profile/`) is used so that cached sessions & cookies carry over between runs, reducing how often full credentials are needed for every run.
 
 ## Prerequisites
 
