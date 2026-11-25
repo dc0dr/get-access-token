@@ -42,9 +42,32 @@ def login_bypass() -> Any:
     logger.info("✅ Navigated to the Microsoft Graph Explorer page\n")
 
     try:
-        with context.expect_page() as popup_info:
-            page.get_by_role("button", name="Sign in").click()
-        popup = popup_info.value
+        login_verifier = page.locator(f"button[aria-label*='{NAME} Sign out' i]")
+        sign_in_btn = page.get_by_role("button", name="Sign in")
+
+        # Wait for either the Sign in button or the signed-in user button to appear
+        sign_in_btn.or_(login_verifier).first.wait_for(state="visible", timeout=20000)
+
+        if login_verifier.is_visible():
+            logger.info("✅ Already signed in to Graph Explorer!\n")
+            return p, context, page
+
+        popup = None
+        try:
+            with context.expect_page(timeout=15000) as popup_info:
+                sign_in_btn.click()
+            popup = popup_info.value
+        except PlaywrightTimeoutError:
+            # Silent SSO / cached session may sign in without opening a popup
+            try:
+                login_verifier.wait_for(state="attached", timeout=5000)
+                logger.info("✅ Signed in silently to Graph Explorer (no popup)!\n")
+                return p, context, page
+            except PlaywrightTimeoutError:
+                raise PlaywrightTimeoutError(
+                    "No login popup opened and sign-in did not complete within timeout"
+                )
+
         parsed_init_url = urlparse(popup.url)
         logger.info("Popup opened at: %s://%s/", parsed_init_url.scheme, parsed_init_url.netloc)
 
@@ -83,7 +106,6 @@ def login_bypass() -> Any:
         # === Verify login succeeded ===
         try:
             #page.wait_for_selector(f"button[aria-label*='{NAME} Sign Out']", timeout=20000) //just realised it was deprecated after reading the docs
-            login_verifier = page.locator(f"button[aria-label*='{NAME} Sign out' i]")
             login_verifier.wait_for(state="attached", timeout=20000)
             logger.info("✅ Successfully signed in to Graph Explorer!\n")
         except PlaywrightTimeoutError:
@@ -156,16 +178,33 @@ def handle_microsoft_login(popup, username):
 
 
 def handle_onelogin_popup(popup, username, password):
-    """Handles OneLogin sequence inside popup"""
-    
-    try:
-        popup.wait_for_selector("input[name='username']", timeout=15000)
-        popup.fill("input[name='username']", username)
-        popup.click("button[type='submit']")
+    """Handles OneLogin sequence inside popup.
 
-        popup.wait_for_selector("input[name='password']", timeout=15000)
-        popup.fill("input[name='password']", password)
-        popup.click("button[type='submit']")
+    Supports both fresh logins (username then password) and remembered sessions
+    where OneLogin skips straight to the password prompt.
+    """
+    username_sel = "input[name='username']"
+    password_sel = "input[name='password']"
+    submit_sel = "button[type='submit']"
+
+    try:
+        # Wait for either visible username (fresh login) or visible password (remembered user).
+        # :visible avoids matching the hidden <input hidden name="username"> on remembered sessions.
+        popup.locator(f"{username_sel}:visible, {password_sel}:visible").first.wait_for(
+            state="visible", timeout=15000
+        )
+
+        if popup.locator(username_sel).is_visible():
+            logger.info("  ↳ OneLogin username input detected – entering username")
+            popup.fill(username_sel, username)
+            if not popup.locator(password_sel).is_visible():
+                popup.click(submit_sel)
+
+        password_input = popup.locator(password_sel)
+        password_input.wait_for(state="visible", timeout=15000)
+        logger.info("  ↳ OneLogin password input detected – entering password")
+        password_input.fill(password)
+        popup.click(submit_sel)
     except Exception as e:
         logger.exception("❌ OneLogin popup failed: %s", e)
         return None, None, None
