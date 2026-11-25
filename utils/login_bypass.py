@@ -156,16 +156,32 @@ def handle_microsoft_login(popup, username):
 
 
 def handle_onelogin_popup(popup, username, password):
-    """Handles OneLogin sequence inside popup"""
-    
-    try:
-        popup.wait_for_selector("input[name='username']", timeout=15000)
-        popup.fill("input[name='username']", username)
-        popup.click("button[type='submit']")
+    """Handles OneLogin sequence inside popup.
 
-        popup.wait_for_selector("input[name='password']", timeout=15000)
-        popup.fill("input[name='password']", password)
-        popup.click("button[type='submit']")
+    Supports both fresh logins (username then password) and remembered sessions
+    where OneLogin skips straight to the password prompt.
+    """
+    username_sel = "input[name='username']"
+    password_sel = "input[name='password']"
+    submit_sel = "button[type='submit']"
+
+    try:
+        # Wait for either username (fresh login) or password (remembered user)
+        popup.locator(f"{username_sel}, {password_sel}").first.wait_for(
+            state="visible", timeout=15000
+        )
+
+        if popup.locator(username_sel).is_visible():
+            logger.info("  ↳ OneLogin username input detected – entering username")
+            popup.fill(username_sel, username)
+            if not popup.locator(password_sel).is_visible():
+                popup.click(submit_sel)
+
+        password_input = popup.locator(password_sel)
+        password_input.wait_for(state="visible", timeout=15000)
+        logger.info("  ↳ OneLogin password input detected – entering password")
+        password_input.fill(password)
+        popup.click(submit_sel)
     except Exception as e:
         logger.exception("❌ OneLogin popup failed: %s", e)
         return None, None, None
