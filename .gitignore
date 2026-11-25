@@ -23,3 +23,6 @@ output_files/
 
 # Miscellaneous
 .DS_Store
+
+# Agent notes
+.agents/
