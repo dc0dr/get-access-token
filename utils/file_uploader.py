@@ -42,17 +42,32 @@ def upload_file(file_content):
 
     destination_dir = DESTINATION_DIR
     os.makedirs(destination_dir, exist_ok=True)
+    destination_file = os.path.join(destination_dir, os.path.basename(file_path))
 
-    # Copy the file to the OneDrive folder
-    destination_path = shutil.copy(file_path, destination_dir)
-    logger.info("✅ File copied to: %s", destination_path)
+    try:
+        # Remove any existing file first to avoid in-place overwrite issues on OneDrive/CloudStorage
+        if os.path.lexists(destination_file):
+            os.remove(destination_file)
+
+        destination_path = shutil.copy(file_path, destination_file)
+        logger.info("✅ File copied to: %s", destination_path)
+    except PermissionError as e:
+        logger.exception(
+            "❌ Permission denied copying to %s (check macOS Full Disk Access / OneDrive permissions): %s",
+            destination_file,
+            e,
+        )
+        return None
+    except Exception as e:
+        logger.exception("❌ Failed to copy file to %s: %s", destination_file, e)
+        return None
 
     # ---- Deletes the original file (only if copying succeeded) ----
     if os.path.exists(destination_path):
         os.remove(file_path)
         logger.info("✅ Original file deleted: %s", file_path)
     else:
-        logger.exception("❌ Original file not found: %s", file_path)
+        logger.error("❌ Destination file not found after copy: %s", destination_path)
         return None
     
     
